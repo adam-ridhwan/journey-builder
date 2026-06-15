@@ -48,6 +48,7 @@ export function FormModal({ forms, node }: FormModalProps) {
           return (
             <FormField
               key={i}
+              name={scopeKey}
               element={element}
               fieldSchemaProperty={fieldSchmaProperty}
               isRequired={isRequired}

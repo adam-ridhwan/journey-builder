@@ -1,4 +1,3 @@
-import { getScopeKey } from '@/utils/resolve-scope';
 import { Button, Checkbox, Form, Input, Select } from 'antd';
 
 import type {
@@ -7,6 +6,7 @@ import type {
 } from '@/api/blueprint-graph/blueprint-graph-types';
 
 type FormFieldProps = {
+  name: string;
   element: UiSchemaElement;
   fieldSchemaProperty: FieldSchemaProperty;
   isRequired: boolean;
@@ -23,12 +23,12 @@ function stringEnum(values: unknown[] | null | undefined): string[] {
 }
 
 export function FormField({
+  name,
   element,
   fieldSchemaProperty,
   isRequired,
 }: FormFieldProps) {
   const label = element.label ?? fieldSchemaProperty.title ?? '';
-  const name = getScopeKey(element.scope);
 
   // A button is an action, not a data field — no `name`/validation binding.
   if (fieldSchemaProperty.avantos_type === 'button') {
