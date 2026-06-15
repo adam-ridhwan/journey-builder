@@ -6,7 +6,6 @@ import {
   setFormData,
 } from '@/features/form/form-slice';
 import { closeModal } from '@/features/modal/modal-slice';
-import { getScopeKey } from '@/utils/resolve-scope';
 import { Button, Form, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
