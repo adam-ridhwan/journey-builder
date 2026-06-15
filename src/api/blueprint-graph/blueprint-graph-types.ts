@@ -20,7 +20,7 @@ export interface FieldSchemaProperty {
   title?: string;
   format?: string;
   items?: { enum?: string[]; type?: string };
-  enum?: unknown;
+  enum?: unknown[] | null;
   uniqueItems?: boolean;
 }
 
@@ -30,6 +30,38 @@ export interface FormFieldSchema {
   required?: string[];
 }
 
+export type UiSchemaScope = `#/properties/${string}`;
+
+/** Layout container element types that hold nested `elements`. */
+export type UiSchemaLayoutType =
+  | 'VerticalLayout'
+  | 'HorizontalLayout'
+  | 'Group';
+
+/** A leaf element bound to a single field via `scope` (rendered control or button). */
+export interface UiSchemaControl {
+  type: 'Control' | 'Button';
+  scope: UiSchemaScope;
+  label?: string;
+  options?: {
+    format?: string;
+    [key: string]: unknown;
+  };
+}
+
+/** A layout container holding nested elements (may nest other layouts). */
+export interface UiSchemaLayout {
+  type: UiSchemaLayoutType;
+  elements: UiSchemaElement[];
+  label?: string;
+}
+
+/** Any node in the UI schema tree: a layout container or a leaf control/button. */
+export type UiSchemaElement = UiSchemaLayout | UiSchemaControl;
+
+/** Root of a form's UI schema (typically a layout). Drives field order and labels. */
+export type UiSchema = UiSchemaLayout;
+
 /** A reusable form definition. Referenced by nodes via `component_id`. */
 export interface FormDefinition {
   id: string;
@@ -37,7 +69,7 @@ export interface FormDefinition {
   description?: string;
   is_reusable?: boolean;
   field_schema: FormFieldSchema;
-  ui_schema?: unknown;
+  ui_schema?: UiSchema;
   dynamic_field_config?: Record<string, unknown>;
 }
 

@@ -36,9 +36,18 @@ export function BlueprintFlow() {
 
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: AppNode) => {
-      dispatch(openModal(<FormModal node={node} />));
+      if (!graph) return;
+
+      switch (node.type) {
+        case 'formNode':
+          dispatch(openModal(<FormModal forms={graph.forms} node={node} />));
+          break;
+
+        default:
+        // no-op
+      }
     },
-    [dispatch]
+    [dispatch, graph]
   );
 
   return (
