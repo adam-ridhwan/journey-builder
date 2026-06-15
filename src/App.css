@@ -71,9 +71,6 @@
 }
 
 .form-field__container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   padding-block: 20px;
 }
 

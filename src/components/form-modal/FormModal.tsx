@@ -3,7 +3,7 @@ import { FormField } from './FormField';
 import { useAppDispatch } from '@/app/hooks';
 import { closeModal } from '@/features/modal/modal-slice';
 import { getScopeKey } from '@/utils/resolve-scope';
-import { Button, Modal } from 'antd';
+import { Button, Form, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
 import type { FormDefinition } from '@/api/blueprint-graph/blueprint-graph-types';
@@ -22,6 +22,8 @@ export function FormModal({ forms, node }: FormModalProps) {
   );
   if (!formDefinition) throw new Error('Form definition not found');
 
+  const elements = formDefinition.ui_schema?.elements ?? [];
+
   return (
     <Modal
       centered
@@ -35,20 +37,24 @@ export function FormModal({ forms, node }: FormModalProps) {
         </>
       }
     >
-      <div className='form-field__container'>
-        {formDefinition.ui_schema.elements.map((element, i) => {
+      <Form layout='vertical' className='form-field__container'>
+        {elements.map((element, i) => {
           const scopeKey = getScopeKey(element.scope);
           const fieldSchmaProperty =
             formDefinition.field_schema.properties[scopeKey];
+          const isRequired =
+            formDefinition.field_schema.required?.includes(scopeKey) ?? false;
+
           return (
             <FormField
               key={i}
               element={element}
               fieldSchemaProperty={fieldSchmaProperty}
+              isRequired={isRequired}
             />
           );
         })}
-      </div>
+      </Form>
     </Modal>
   );
 }

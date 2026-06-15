@@ -1,4 +1,5 @@
-import { Button, Checkbox, Input, Select } from 'antd';
+import { getScopeKey } from '@/utils/resolve-scope';
+import { Button, Checkbox, Form, Input, Select } from 'antd';
 
 import type {
   FieldSchemaProperty,
@@ -8,6 +9,7 @@ import type {
 type FormFieldProps = {
   element: UiSchemaElement;
   fieldSchemaProperty: FieldSchemaProperty;
+  isRequired: boolean;
 };
 
 /** Build antd Select/Checkbox options from a list of string values. */
@@ -20,24 +22,36 @@ function stringEnum(values: unknown[] | null | undefined): string[] {
   return (values ?? []).filter((v): v is string => typeof v === 'string');
 }
 
-export function FormField({ element, fieldSchemaProperty }: FormFieldProps) {
+export function FormField({
+  element,
+  fieldSchemaProperty,
+  isRequired,
+}: FormFieldProps) {
   const label = element.label ?? fieldSchemaProperty.title ?? '';
+  const name = getScopeKey(element.scope);
+
+  // A button is an action, not a data field — no `name`/validation binding.
+  if (fieldSchemaProperty.avantos_type === 'button') {
+    return (
+      <Form.Item label={label}>
+        <Button>{label || 'Button'}</Button>
+      </Form.Item>
+    );
+  }
 
   function renderControl() {
     switch (fieldSchemaProperty.avantos_type) {
-      case 'button':
-        return <Button>{label || 'Button'}</Button>;
-
       case 'short-text':
         return (
           <Input
             type={fieldSchemaProperty.format === 'email' ? 'email' : 'text'}
             placeholder={label}
+            allowClear
           />
         );
 
       case 'multi-line-text':
-        return <Input.TextArea rows={4} placeholder={label} />;
+        return <Input.TextArea rows={4} placeholder={label} allowClear />;
 
       case 'checkbox-group':
         return (
@@ -73,9 +87,16 @@ export function FormField({ element, fieldSchemaProperty }: FormFieldProps) {
   }
 
   return (
-    <div className='form-field'>
-      <label>{label}</label>
+    <Form.Item
+      label={label}
+      name={name}
+      rules={
+        isRequired
+          ? [{ required: true, message: `${label} is required` }]
+          : undefined
+      }
+    >
       {renderControl()}
-    </div>
+    </Form.Item>
   );
 }
