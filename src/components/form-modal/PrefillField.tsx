@@ -10,8 +10,8 @@ type PrefillFieldProps = {
 
 /**
  * One field's prefill row.
- * - Unmapped: dashed row with an icon + field name; click to pick a source.
- * - Mapped: filled pill showing `fieldKey: source` with a clear button.
+ * - Unmapped: dashed row with the field name; click to pick a source.
+ * - Mapped: shows `fieldKey: source`.
  */
 export function PrefillField({
   element,
@@ -19,6 +19,7 @@ export function PrefillField({
   onSelect,
 }: PrefillFieldProps) {
   const fieldKey = getScopeKey(element.scope);
+  const source = prefillMappings[fieldKey];
 
   return (
     <button
@@ -26,7 +27,9 @@ export function PrefillField({
       className='prefill-field prefill-field--empty'
       onClick={onSelect}
     >
-      <span className='prefill-field__placeholder'>{fieldKey}</span>
+      <span className='prefill-field__placeholder'>
+        {source ? `${fieldKey}: ${source}` : fieldKey}
+      </span>
     </button>
   );
 }

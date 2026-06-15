@@ -12,14 +12,14 @@ import { closeModal, openSubModal } from '@/features/modal/modal-slice';
 import { Button, Form, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
-import type { FormDefinition } from '@/api/blueprint-graph/blueprint-graph-types';
+import type { BlueprintGraph } from '@/api/blueprint-graph/blueprint-graph-types';
 
 type FormModalProps = {
-  forms: FormDefinition[];
+  graph: BlueprintGraph;
   node: FormNodeType;
 };
 
-export function FormModal({ forms, node }: FormModalProps) {
+export function FormModal({ graph, node }: FormModalProps) {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
 
@@ -32,8 +32,8 @@ export function FormModal({ forms, node }: FormModalProps) {
   const [prefillMappings] = useState<Record<string, string>>({});
 
   const formDefinition = useMemo(
-    () => forms.find((f) => f.id === node.data.component_id),
-    [forms, node]
+    () => graph.forms.find((f) => f.id === node.data.component_id),
+    [graph, node]
   );
   if (!formDefinition) throw new Error('Form definition not found');
 
@@ -73,7 +73,11 @@ export function FormModal({ forms, node }: FormModalProps) {
                 key={element.scope}
                 element={element}
                 prefillMappings={prefillMappings}
-                onSelect={() => dispatch(openSubModal(<PrefillModal />))}
+                onSelect={() =>
+                  dispatch(
+                    openSubModal(<PrefillModal graph={graph} node={node} />)
+                  )
+                }
               />
             ))}
           </div>

@@ -40,7 +40,7 @@ export function BlueprintFlow() {
 
       switch (node.type) {
         case 'formNode':
-          dispatch(openModal(<FormModal forms={graph.forms} node={node} />));
+          dispatch(openModal(<FormModal graph={graph} node={node} />));
           break;
 
         default:
