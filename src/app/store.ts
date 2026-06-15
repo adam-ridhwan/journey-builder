@@ -1,4 +1,5 @@
 import { blueprintGraphApi } from '@/api/blueprint-graph/blueprint-graph-api';
+import { formReducer } from '@/features/form/form-slice';
 import { modalReducer } from '@/features/modal/modal-slice';
 import { configureStore } from '@reduxjs/toolkit';
 
@@ -6,6 +7,7 @@ export const store = configureStore({
   reducer: {
     [blueprintGraphApi.reducerPath]: blueprintGraphApi.reducer,
     modal: modalReducer,
+    form: formReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { FormField } from './FormField';
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { selectFormDataByNodeId } from '@/features/form/form-slice';
 import { closeModal } from '@/features/modal/modal-slice';
 import { getScopeKey } from '@/utils/resolve-scope';
 import { Button, Form, Modal } from 'antd';
@@ -15,6 +16,9 @@ type FormModalProps = {
 
 export function FormModal({ forms, node }: FormModalProps) {
   const dispatch = useAppDispatch();
+
+  const formDataByNodeId = useAppSelector(selectFormDataByNodeId(node.data.id));
+  console.log('formDataByNodeId', formDataByNodeId);
 
   const formDefinition = useMemo(
     () => forms.find((f) => f.id === node.data.component_id),
@@ -48,6 +52,7 @@ export function FormModal({ forms, node }: FormModalProps) {
           return (
             <FormField
               key={i}
+              nodeId={node.data.id}
               name={scopeKey}
               element={element}
               fieldSchemaProperty={fieldSchmaProperty}
