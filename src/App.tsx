@@ -1,4 +1,4 @@
-import { BlueprintFlow } from './features/blueprint-flow/BlueprintFlow';
+import { BlueprintFlow } from '@/components/blueprint-flow/BlueprintFlow';
 
 import './App.css';
 

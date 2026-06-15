@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { nodeTypes } from '../blueprint-nodes/node-types';
+import { FormModal } from '../form-modal/FormModal';
 import { createEdges } from './create-edges';
 import { createNodes } from './create-nodes';
 import { useGetBlueprintGraphQuery } from '@/api/blueprint-graph/blueprint-graph-api';
+import { useAppDispatch } from '@/app/hooks';
+import { openModal } from '@/features/modal/modal-slice';
 import {
   Background,
   Controls,
@@ -18,6 +21,8 @@ import type { Edge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 export function BlueprintFlow() {
+  const dispatch = useAppDispatch();
+
   const { data: graph } = useGetBlueprintGraphQuery();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>([]);
@@ -29,6 +34,13 @@ export function BlueprintFlow() {
     setEdges(createEdges(graph));
   }, [graph, setNodes, setEdges]);
 
+  const onNodeClick = useCallback(
+    (_event: React.MouseEvent, node: AppNode) => {
+      dispatch(openModal(<FormModal node={node} />));
+    },
+    [dispatch]
+  );
+
   return (
     <ReactFlow
       nodes={nodes}
@@ -36,6 +48,7 @@ export function BlueprintFlow() {
       nodeTypes={nodeTypes}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
+      onNodeClick={onNodeClick}
       fitView
     >
       <Background />
