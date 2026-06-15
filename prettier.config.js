@@ -1,0 +1,23 @@
+export default {
+  printWidth: 80,
+  tabWidth: 2,
+  useTabs: false,
+  semi: true,
+  singleQuote: true,
+  jsxSingleQuote: true,
+  trailingComma: 'es5',
+  bracketSpacing: true,
+  arrowParens: 'always',
+  importOrder: [
+    '^react.*$',
+    '<BUILTIN_MODULES>',
+    '<THIRD_PARTY_MODULES>',
+    '',
+    '<TYPES>',
+    '',
+    '^.+\\.css$',
+  ],
+  importOrderSafeSideEffects: ['^.+\\.css$'],
+  importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
+  plugins: ['@ianvs/prettier-plugin-sort-imports'],
+};
