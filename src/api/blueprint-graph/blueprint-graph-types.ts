@@ -30,37 +30,29 @@ export interface FormFieldSchema {
   required?: string[];
 }
 
+/** A JSON Pointer from the UI schema into the field schema, e.g. "#/properties/email". */
 export type UiSchemaScope = `#/properties/${string}`;
 
-/** Layout container element types that hold nested `elements`. */
-export type UiSchemaLayoutType =
-  | 'VerticalLayout'
-  | 'HorizontalLayout'
-  | 'Group';
-
-/** A leaf element bound to a single field via `scope` (rendered control or button). */
-export interface UiSchemaControl {
+/** A single rendered element bound to a field via `scope` (a control or button). */
+export interface UiSchemaElement {
   type: 'Control' | 'Button';
+  /** Points at the field in the field schema this element renders. */
   scope: UiSchemaScope;
   label?: string;
+  /** Widget hints, e.g. `{ format: 'multi-select' }`. */
   options?: {
     format?: string;
     [key: string]: unknown;
   };
 }
 
-/** A layout container holding nested elements (may nest other layouts). */
-export interface UiSchemaLayout {
-  type: UiSchemaLayoutType;
+/** Root of a form's UI schema: a layout with an ordered list of elements. */
+export interface UiSchema {
+  type: 'VerticalLayout' | 'HorizontalLayout' | 'Group';
+  /** Display order of the form's fields. */
   elements: UiSchemaElement[];
   label?: string;
 }
-
-/** Any node in the UI schema tree: a layout container or a leaf control/button. */
-export type UiSchemaElement = UiSchemaLayout | UiSchemaControl;
-
-/** Root of a form's UI schema (typically a layout). Drives field order and labels. */
-export type UiSchema = UiSchemaLayout;
 
 /** A reusable form definition. Referenced by nodes via `component_id`. */
 export interface FormDefinition {

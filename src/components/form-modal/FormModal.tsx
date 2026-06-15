@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
+import { FormField } from './FormField';
 import { useAppDispatch } from '@/app/hooks';
 import { closeModal } from '@/features/modal/modal-slice';
+import { getScopeKey } from '@/utils/resolve-scope';
 import { Button, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
@@ -20,8 +22,6 @@ export function FormModal({ forms, node }: FormModalProps) {
   );
   if (!formDefinition) throw new Error('Form definition not found');
 
-  console.log(formDefinition.ui_schema.elements);
-
   return (
     <Modal
       centered
@@ -35,9 +35,20 @@ export function FormModal({ forms, node }: FormModalProps) {
         </>
       }
     >
-      {formDefinition.ui_schema.elements.map((element, i) => (
-        <div key={i}>{element.label}</div>
-      ))}
+      <div className='form-field__container'>
+        {formDefinition.ui_schema.elements.map((element, i) => {
+          const scopeKey = getScopeKey(element.scope);
+          const fieldSchmaProperty =
+            formDefinition.field_schema.properties[scopeKey];
+          return (
+            <FormField
+              key={i}
+              element={element}
+              fieldSchemaProperty={fieldSchmaProperty}
+            />
+          );
+        })}
+      </div>
     </Modal>
   );
 }
