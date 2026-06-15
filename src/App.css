@@ -83,6 +83,67 @@
   gap: 4px;
 }
 
+.prefill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prefill-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  text-align: left;
+}
+
+/* Unmapped: dashed, muted, clickable. */
+.prefill-field--empty {
+  border: 1px dashed #d9d9d9;
+  background: transparent;
+  color: #8c8c8c;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.prefill-field--empty:hover {
+  border-color: #4096ff;
+  background: #f5f9ff;
+}
+
+.prefill-field__icon {
+  font-size: 18px;
+  color: #8c8c8c;
+}
+
+/* Mapped: filled pill with a clear button. */
+.prefill-field--mapped {
+  justify-content: space-between;
+  border: 1px solid transparent;
+  background: #f0f0f0;
+  color: #1a1a22;
+}
+
+.prefill-field__clear {
+  display: flex;
+  border: none;
+  padding: 0;
+  background: none;
+  color: #bfbfbf;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.prefill-field__clear:hover {
+  color: #8c8c8c;
+}
+
 .prefill-toggle {
   display: flex;
   align-items: center;

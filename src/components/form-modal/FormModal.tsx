@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FormField } from './FormField';
+import { PrefillField } from './PrefillField';
 import { PrefillToggle } from './PrefillToggle';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
@@ -7,6 +8,7 @@ import {
   setFormData,
 } from '@/features/form/form-slice';
 import { closeModal } from '@/features/modal/modal-slice';
+import { getScopeKey } from '@/utils/resolve-scope';
 import { Button, Form, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
@@ -26,6 +28,14 @@ export function FormModal({ forms, node }: FormModalProps) {
   const savedFormData = useAppSelector(selectFormDataByNodeId(nodeId));
 
   const [isPrefillEnabled, setIsPrefillEnabled] = useState(false);
+  // Field mappings, keyed by field name → source label (e.g. `Form A.email`).
+  const [prefillMappings, setPrefillMappings] = useState<
+    Record<string, string>
+  >({});
+
+  function clearMapping(fieldKey: string) {
+    setPrefillMappings(({ [fieldKey]: _removed, ...rest }) => rest);
+  }
 
   const formDefinition = useMemo(
     () => forms.find((f) => f.id === node.data.component_id),
@@ -38,6 +48,8 @@ export function FormModal({ forms, node }: FormModalProps) {
     dispatch(setFormData({ nodeId, data: values }));
     dispatch(closeModal());
   }
+
+  const uiSchemaElements = formDefinition.ui_schema?.elements ?? [];
 
   return (
     <Modal
@@ -60,20 +72,33 @@ export function FormModal({ forms, node }: FormModalProps) {
           onChange={setIsPrefillEnabled}
         />
 
-        <Form
-          form={form}
-          layout='vertical'
-          initialValues={savedFormData}
-          onFinish={handleSubmit}
-        >
-          {(formDefinition.ui_schema?.elements ?? []).map((element, i) => (
-            <FormField
-              key={i}
-              element={element}
-              fieldSchema={formDefinition.field_schema}
-            />
-          ))}
-        </Form>
+        {isPrefillEnabled ? (
+          <div className='prefill-list'>
+            {uiSchemaElements.map((element) => (
+              <PrefillField
+                key={element.scope}
+                element={element}
+                prefillMappings={prefillMappings}
+                onSelect={() => {}}
+              />
+            ))}
+          </div>
+        ) : (
+          <Form
+            form={form}
+            layout='vertical'
+            initialValues={savedFormData}
+            onFinish={handleSubmit}
+          >
+            {uiSchemaElements.map((element) => (
+              <FormField
+                key={element.scope}
+                element={element}
+                fieldSchema={formDefinition.field_schema}
+              />
+            ))}
+          </Form>
+        )}
       </div>
     </Modal>
   );
