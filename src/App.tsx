@@ -1,11 +1,13 @@
-import { useGetBlueprintGraphQuery } from '@/api/blueprint-graph/blueprint-graph-api';
+import { BlueprintFlow } from './features/blueprint-flow/BlueprintFlow';
 
 import './App.css';
 
 function App() {
-  const { data: graph } = useGetBlueprintGraphQuery();
-
-  return <></>;
+  return (
+    <div className='container'>
+      <BlueprintFlow />
+    </div>
+  );
 }
 
 export default App;
