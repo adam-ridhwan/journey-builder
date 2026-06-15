@@ -8,14 +8,13 @@ import type {
   BlueprintGraph,
   GraphNode,
 } from '@/api/blueprint-graph/blueprint-graph-types';
-import type { Edge } from '@xyflow/react';
 
 /**
  * Map a single API node to the right `AppNode` variant.
  * Branch on the API node's `type` (or `data.component_type`) to pick the
  * React Flow node type; each `case` returns a different node in the union.
  */
-function toFlowNode(node: GraphNode): AppNode {
+function createNode(node: GraphNode): AppNode {
   switch (node.type) {
     case 'form':
       return {
@@ -40,15 +39,6 @@ function toFlowNode(node: GraphNode): AppNode {
 }
 
 /** Map API graph nodes to React Flow nodes. */
-export function toFlowNodes(graph: BlueprintGraph): AppNode[] {
-  return graph.nodes.map(toFlowNode);
-}
-
-/** Map API edges (source = prerequisite of target) to React Flow edges. */
-export function toFlowEdges(graph: BlueprintGraph): Edge[] {
-  return graph.edges.map((edge) => ({
-    id: `${edge.source}->${edge.target}`,
-    source: edge.source,
-    target: edge.target,
-  }));
+export function createNodes(graph: BlueprintGraph): AppNode[] {
+  return graph.nodes.map(createNode);
 }

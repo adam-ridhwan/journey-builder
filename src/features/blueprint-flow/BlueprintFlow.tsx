@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { nodeTypes } from '../blueprint-nodes/node-types';
-import { toFlowEdges, toFlowNodes } from './graph-to-flow';
+import { createEdges } from './create-edges';
+import { createNodes } from './create-nodes';
 import { useGetBlueprintGraphQuery } from '@/api/blueprint-graph/blueprint-graph-api';
 import {
   Background,
@@ -24,8 +25,8 @@ export function BlueprintFlow() {
 
   useEffect(() => {
     if (!graph) return;
-    setNodes(toFlowNodes(graph));
-    setEdges(toFlowEdges(graph));
+    setNodes(createNodes(graph));
+    setEdges(createEdges(graph));
   }, [graph, setNodes, setEdges]);
 
   return (
