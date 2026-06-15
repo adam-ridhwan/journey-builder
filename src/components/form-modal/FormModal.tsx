@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react';
 import { FormField } from './FormField';
 import { PrefillField } from './PrefillField';
+import { PrefillModal } from './PrefillModal';
 import { PrefillToggle } from './PrefillToggle';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
   selectFormDataByNodeId,
   setFormData,
 } from '@/features/form/form-slice';
-import { closeModal } from '@/features/modal/modal-slice';
-import { getScopeKey } from '@/utils/resolve-scope';
+import { closeModal, openSubModal } from '@/features/modal/modal-slice';
 import { Button, Form, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
@@ -29,13 +29,7 @@ export function FormModal({ forms, node }: FormModalProps) {
 
   const [isPrefillEnabled, setIsPrefillEnabled] = useState(false);
   // Field mappings, keyed by field name → source label (e.g. `Form A.email`).
-  const [prefillMappings, setPrefillMappings] = useState<
-    Record<string, string>
-  >({});
-
-  function clearMapping(fieldKey: string) {
-    setPrefillMappings(({ [fieldKey]: _removed, ...rest }) => rest);
-  }
+  const [prefillMappings] = useState<Record<string, string>>({});
 
   const formDefinition = useMemo(
     () => forms.find((f) => f.id === node.data.component_id),
@@ -79,7 +73,7 @@ export function FormModal({ forms, node }: FormModalProps) {
                 key={element.scope}
                 element={element}
                 prefillMappings={prefillMappings}
-                onSelect={() => {}}
+                onSelect={() => dispatch(openSubModal(<PrefillModal />))}
               />
             ))}
           </div>
