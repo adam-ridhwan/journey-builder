@@ -17,6 +17,7 @@ const formSlice = createSlice({
     formData: {},
   } as FormState,
   reducers: {
+    /** Update a single field for a node (incremental edits). */
     updateFormData(
       state,
       action: PayloadAction<{ nodeId: string; key: string; value: unknown }>
@@ -26,10 +27,17 @@ const formSlice = createSlice({
       nodeData[key] = value;
       state.formData[nodeId] = nodeData;
     },
+    /** Replace a node's entire form data (e.g. commit on submit). */
+    setFormData(
+      state,
+      action: PayloadAction<{ nodeId: string; data: NodeFormData }>
+    ) {
+      state.formData[action.payload.nodeId] = action.payload.data;
+    },
   },
 });
 
-export const { updateFormData } = formSlice.actions;
+export const { updateFormData, setFormData } = formSlice.actions;
 
 export const formReducer = formSlice.reducer;
 
