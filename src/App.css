@@ -70,7 +70,10 @@
   color: #6b6375;
 }
 
-.form-field__container {
+.form-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding-block: 20px;
 }
 
@@ -78,4 +81,16 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.prefill-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.prefill-toggle__text {
+  display: flex;
+  flex-direction: column;
 }
