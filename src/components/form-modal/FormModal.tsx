@@ -25,12 +25,12 @@ export function FormModal({ graph, node }: FormModalProps) {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
 
-  const nodeId = node.data.id;
+  const nodeDataId = node.data.id;
+  const nodeId = node.id;
+
   // Prefill the form with whatever was last committed for this node.
-  const savedFormData = useAppSelector(selectFormDataByNodeId(nodeId));
-  const prefillMappings = useAppSelector(
-    selectPrefillMappingsByNodeId(node.id)
-  );
+  const savedFormData = useAppSelector(selectFormDataByNodeId(nodeDataId));
+  const prefillMappings = useAppSelector(selectPrefillMappingsByNodeId(nodeId));
 
   const [isPrefillEnabled, setIsPrefillEnabled] = useState(false);
   // Field mappings, keyed by field name → source label (e.g. `Form A.email`).
@@ -43,7 +43,7 @@ export function FormModal({ graph, node }: FormModalProps) {
 
   /** Commit the local form values to the global store, then close. */
   function handleSubmit(values: Record<string, unknown>) {
-    dispatch(setFormData({ nodeId: node.id, data: values }));
+    dispatch(setFormData({ nodeId, data: values }));
     dispatch(closeModal());
   }
 
