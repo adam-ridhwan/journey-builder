@@ -45,6 +45,14 @@ function makeForm(spec: FormSpec): FormDefinition {
         ])
       ),
     },
+    ui_schema: {
+      type: 'VerticalLayout',
+      elements: spec.fields.map((key) => ({
+        type: 'Control' as const,
+        scope: `#/properties/${key}` as const,
+        label: key,
+      })),
+    },
   };
 }
 
@@ -65,6 +73,18 @@ export function buildGraph(specs: FormSpec[]): BlueprintGraph {
 /** A bare node usable where only `node.id` matters (the prefill data sources). */
 export function asFormNode(id: string): FormNodeType {
   return { id } as unknown as FormNodeType;
+}
+
+/** A full `FormNodeType` for a node in `graph` (carries the data `FormModal` needs). */
+export function formNode(graph: BlueprintGraph, id: string): FormNodeType {
+  const node = graph.nodes.find((n) => n.id === id);
+  if (!node) throw new Error(`No node with id "${id}" in graph`);
+  return {
+    id: node.id,
+    type: 'formNode',
+    position: node.position,
+    data: node.data,
+  } as unknown as FormNodeType;
 }
 
 /**

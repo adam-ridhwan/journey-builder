@@ -12,8 +12,9 @@ export default defineConfig({
     },
   },
   test: {
-    // Pure logic (utils, reducers, registry) needs no DOM.
+    // Default to node for pure logic (utils, reducers, registry). Component
+    // tests opt into jsdom per-file via `// @vitest-environment jsdom`.
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
   },
 });
