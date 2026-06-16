@@ -4,7 +4,8 @@ import type { UiSchemaElement } from '@/api/blueprint-graph/blueprint-graph-type
 
 type PrefillFieldProps = {
   element: UiSchemaElement;
-  prefillMappings: Record<string, string | null>;
+  /** Mapped source label (e.g. `Form A.email`); undefined when unmapped. */
+  source?: string;
   onSelect: () => void;
 };
 
@@ -13,22 +14,18 @@ type PrefillFieldProps = {
  * - Unmapped: dashed row with the field name; click to pick a source.
  * - Mapped: shows `fieldKey: source`.
  */
-export function PrefillField({
-  element,
-  prefillMappings,
-  onSelect,
-}: PrefillFieldProps) {
+export function PrefillField({ element, source, onSelect }: PrefillFieldProps) {
   const fieldKey = getScopeKey(element.scope);
-  const source = prefillMappings[fieldKey];
 
   return (
     <button
       type='button'
-      className='prefill-field prefill-field--empty'
+      className={`prefill-field ${source ? 'prefill-field--mapped' : 'prefill-field--empty'}`}
       onClick={onSelect}
     >
-      <span className='prefill-field__placeholder'>
-        {source ? `${fieldKey}: ${source}` : fieldKey}
+      <span className='prefill-field__text'>
+        <span className='prefill-field__key'>{fieldKey}</span>
+        {source && <span className='prefill-field__source'>{source}</span>}
       </span>
     </button>
   );

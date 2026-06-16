@@ -166,12 +166,36 @@
   color: #8c8c8c;
 }
 
-/* Mapped: filled pill with a clear button. */
+.prefill-field__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prefill-field__key {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a1a22;
+}
+
+.prefill-field__source {
+  font-size: 12px;
+  color: #1677ff;
+}
+
+/* In the unmapped state the key is just a muted placeholder. */
+.prefill-field--empty .prefill-field__key {
+  font-weight: 400;
+  color: #8c8c8c;
+}
+
+/* Mapped: light blue fill with a blue border. */
 .prefill-field--mapped {
   justify-content: space-between;
-  border: 1px solid transparent;
-  background: #f0f0f0;
+  border: 1px solid #4096ff;
+  background: #e6f4ff;
   color: #1a1a22;
+  cursor: pointer;
 }
 
 .prefill-field__clear {

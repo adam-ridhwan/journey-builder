@@ -9,6 +9,8 @@ import {
   setFormData,
 } from '@/features/form/form-slice';
 import { closeModal, openSubModal } from '@/features/modal/modal-slice';
+import { selectPrefillMappingsByNodeId } from '@/features/prefill/prefill-slice';
+import { getScopeKey } from '@/utils/resolve-scope';
 import { Button, Form, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
@@ -26,10 +28,12 @@ export function FormModal({ graph, node }: FormModalProps) {
   const nodeId = node.data.id;
   // Prefill the form with whatever was last committed for this node.
   const savedFormData = useAppSelector(selectFormDataByNodeId(nodeId));
+  const prefillMappings = useAppSelector(
+    selectPrefillMappingsByNodeId(node.id)
+  );
 
   const [isPrefillEnabled, setIsPrefillEnabled] = useState(false);
   // Field mappings, keyed by field name → source label (e.g. `Form A.email`).
-  const [prefillMappings] = useState<Record<string, string>>({});
 
   const formDefinition = useMemo(
     () => graph.forms.find((f) => f.id === node.data.component_id),
@@ -39,7 +43,7 @@ export function FormModal({ graph, node }: FormModalProps) {
 
   /** Commit the local form values to the global store, then close. */
   function handleSubmit(values: Record<string, unknown>) {
-    dispatch(setFormData({ nodeId, data: values }));
+    dispatch(setFormData({ nodeId: node.id, data: values }));
     dispatch(closeModal());
   }
 
@@ -72,10 +76,16 @@ export function FormModal({ graph, node }: FormModalProps) {
               <PrefillField
                 key={element.scope}
                 element={element}
-                prefillMappings={prefillMappings}
+                source={prefillMappings?.[getScopeKey(element.scope)]?.label}
                 onSelect={() =>
                   dispatch(
-                    openSubModal(<PrefillModal graph={graph} node={node} />)
+                    openSubModal(
+                      <PrefillModal
+                        graph={graph}
+                        node={node}
+                        targetFieldKey={getScopeKey(element.scope)}
+                      />
+                    )
                   )
                 }
               />

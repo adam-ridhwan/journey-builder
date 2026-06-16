@@ -1,5 +1,6 @@
 import { useAppDispatch } from '@/app/hooks';
 import { closeSubModal } from '@/features/modal/modal-slice';
+import { setPrefillMapping } from '@/features/prefill/prefill-slice';
 import { getUpstreamNodes } from '@/utils/get-upstream-nodes';
 import { Modal, Tag } from 'antd';
 
@@ -9,10 +10,12 @@ import type { BlueprintGraph } from '@/api/blueprint-graph/blueprint-graph-types
 type PrefillModalProps = {
   graph: BlueprintGraph;
   node: FormNodeType;
+  /** The field on `node` that this mapping will fill. */
+  targetFieldKey: string;
 };
 
 /** Source-selector modal: pick an upstream form field to prefill from. */
-export function PrefillModal({ graph, node }: PrefillModalProps) {
+export function PrefillModal({ graph, node, targetFieldKey }: PrefillModalProps) {
   const dispatch = useAppDispatch();
 
   const upstreamNodes = getUpstreamNodes(graph, node.id);
@@ -49,9 +52,21 @@ export function PrefillModal({ graph, node }: PrefillModalProps) {
                     type='button'
                     key={fieldKey}
                     className='prefill-source__field'
-                    onClick={() =>
-                      console.log('selected', upstream.id, fieldKey)
-                    }
+                    onClick={() => {
+                      dispatch(
+                        setPrefillMapping({
+                          nodeId: node.id,
+                          fieldKey: targetFieldKey,
+                          source: {
+                            type: 'form-field',
+                            label: `${upstream.data.name}.${fieldKey}`,
+                            sourceNodeId: upstream.id,
+                            sourceFieldKey: fieldKey,
+                          },
+                        })
+                      );
+                      dispatch(closeSubModal());
+                    }}
                   >
                     {fieldKey}
                   </button>
