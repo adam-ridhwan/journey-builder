@@ -14,6 +14,7 @@ import {
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
+import { Button, Result, Spin } from 'antd';
 
 import type { AppNode } from '../blueprint-nodes/node-types';
 import type { Edge } from '@xyflow/react';
@@ -23,7 +24,12 @@ import '@xyflow/react/dist/style.css';
 export function BlueprintFlow() {
   const dispatch = useAppDispatch();
 
-  const { data: graph } = useGetBlueprintGraphQuery();
+  const {
+    data: graph,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetBlueprintGraphQuery();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -49,6 +55,33 @@ export function BlueprintFlow() {
     },
     [dispatch, graph]
   );
+
+  if (isLoading) {
+    return (
+      <div className='flow-state'>
+        <Spin size='large' tip='Loading blueprint…'>
+          <div style={{ padding: 24 }} />
+        </Spin>
+      </div>
+    );
+  }
+
+  if (isError || !graph) {
+    return (
+      <div className='flow-state'>
+        <Result
+          status='error'
+          title='Failed to load the blueprint graph'
+          subTitle='Check that the mock server is running and reachable.'
+          extra={
+            <Button type='primary' onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <ReactFlow
