@@ -5,6 +5,7 @@ import { PrefillModal } from './PrefillModal';
 import { PrefillToggle } from './PrefillToggle';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
+  selectFormData,
   selectFormDataByNodeId,
   setFormData,
 } from '@/features/form/form-slice';
@@ -13,8 +14,9 @@ import {
   clearNodePrefillMappings,
   selectPrefillMappingsByNodeId,
 } from '@/features/prefill/prefill-slice';
+import { resolvePrefillValue } from '@/utils/resolve-prefill-value';
 import { getScopeKey } from '@/utils/resolve-scope';
-import { Button, Form, Modal } from 'antd';
+import { Button, Modal } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
 import type { BlueprintGraph } from '@/api/blueprint-graph/blueprint-graph-types';
@@ -26,13 +28,16 @@ type FormModalProps = {
 
 export function FormModal({ graph, node }: FormModalProps) {
   const dispatch = useAppDispatch();
-  const [form] = Form.useForm();
-
-  const nodeDataId = node.data.id;
   const nodeId = node.id;
 
-  const savedFormData = useAppSelector(selectFormDataByNodeId(nodeDataId));
+  const savedFormData = useAppSelector(selectFormDataByNodeId(nodeId));
   const prefillMappings = useAppSelector(selectPrefillMappingsByNodeId(nodeId));
+  const allFormData = useAppSelector(selectFormData);
+
+  // Local, controlled form values seeded from whatever was last committed.
+  const [values, setValues] = useState<Record<string, unknown>>(
+    () => savedFormData ?? {}
+  );
 
   const hasPrefillMappings = Boolean(
     prefillMappings && Object.keys(prefillMappings).length > 0
@@ -46,9 +51,17 @@ export function FormModal({ graph, node }: FormModalProps) {
   );
   if (!formDefinition) throw new Error('Form definition not found');
 
-  /** Commit the local form values to the global store, then close. */
-  function handleSubmit(values: Record<string, unknown>) {
-    dispatch(setFormData({ nodeId, data: values }));
+  function handleChange(fieldKey: string, value: unknown) {
+    setValues((prev) => ({ ...prev, [fieldKey]: value }));
+  }
+
+  /** Commit local values, overriding mapped fields with their prefilled values. */
+  function handleSubmit() {
+    const data = { ...values };
+    for (const [fieldKey, source] of Object.entries(prefillMappings ?? {})) {
+      data[fieldKey] = resolvePrefillValue(source, allFormData);
+    }
+    dispatch(setFormData({ nodeId, data }));
     dispatch(closeModal());
   }
 
@@ -69,7 +82,7 @@ export function FormModal({ graph, node }: FormModalProps) {
       footer={
         <>
           <Button onClick={() => dispatch(closeModal())}>Cancel</Button>
-          <Button type='primary' onClick={() => form.submit()}>
+          <Button type='primary' onClick={handleSubmit}>
             Submit
           </Button>
         </>
@@ -103,20 +116,20 @@ export function FormModal({ graph, node }: FormModalProps) {
             ))}
           </div>
         ) : (
-          <Form
-            form={form}
-            layout='vertical'
-            initialValues={savedFormData}
-            onFinish={handleSubmit}
-          >
-            {uiSchemaElements.map((element) => (
-              <FormField
-                key={element.scope}
-                element={element}
-                fieldSchema={formDefinition.field_schema}
-              />
-            ))}
-          </Form>
+          <div className='form-fields'>
+            {uiSchemaElements.map((element) => {
+              const fieldKey = getScopeKey(element.scope);
+              return (
+                <FormField
+                  key={element.scope}
+                  element={element}
+                  fieldSchema={formDefinition.field_schema}
+                  value={values[fieldKey]}
+                  onChange={(value) => handleChange(fieldKey, value)}
+                />
+              );
+            })}
+          </div>
         )}
       </div>
     </Modal>

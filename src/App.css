@@ -77,10 +77,25 @@
   padding-block: 20px;
 }
 
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .form-field {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.form-field__label {
+  font-size: 14px;
+  color: #1a1a22;
+}
+
+.form-field__required {
+  color: #ff4d4f;
 }
 
 .prefill-list {
