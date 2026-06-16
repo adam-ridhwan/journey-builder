@@ -9,7 +9,10 @@ import {
   setFormData,
 } from '@/features/form/form-slice';
 import { closeModal, openSubModal } from '@/features/modal/modal-slice';
-import { selectPrefillMappingsByNodeId } from '@/features/prefill/prefill-slice';
+import {
+  clearNodePrefillMappings,
+  selectPrefillMappingsByNodeId,
+} from '@/features/prefill/prefill-slice';
 import { getScopeKey } from '@/utils/resolve-scope';
 import { Button, Form, Modal } from 'antd';
 
@@ -28,12 +31,14 @@ export function FormModal({ graph, node }: FormModalProps) {
   const nodeDataId = node.data.id;
   const nodeId = node.id;
 
-  // Prefill the form with whatever was last committed for this node.
   const savedFormData = useAppSelector(selectFormDataByNodeId(nodeDataId));
   const prefillMappings = useAppSelector(selectPrefillMappingsByNodeId(nodeId));
 
-  const [isPrefillEnabled, setIsPrefillEnabled] = useState(false);
-  // Field mappings, keyed by field name → source label (e.g. `Form A.email`).
+  const hasPrefillMappings = Boolean(
+    prefillMappings && Object.keys(prefillMappings).length > 0
+  );
+  // Default the toggle on when this node already has mappings; user can still flip it.
+  const [isPrefillEnabled, setIsPrefillEnabled] = useState(hasPrefillMappings);
 
   const formDefinition = useMemo(
     () => graph.forms.find((f) => f.id === node.data.component_id),
@@ -45,6 +50,12 @@ export function FormModal({ graph, node }: FormModalProps) {
   function handleSubmit(values: Record<string, unknown>) {
     dispatch(setFormData({ nodeId, data: values }));
     dispatch(closeModal());
+  }
+
+  /** Toggle prefill; clear this node's mappings when turning it off. */
+  function handlePrefillToggle(enabled: boolean) {
+    setIsPrefillEnabled(enabled);
+    if (!enabled) dispatch(clearNodePrefillMappings({ nodeId }));
   }
 
   const uiSchemaElements = formDefinition.ui_schema?.elements ?? [];
@@ -67,7 +78,7 @@ export function FormModal({ graph, node }: FormModalProps) {
       <div className='form-modal__content'>
         <PrefillToggle
           isEnabled={isPrefillEnabled}
-          onChange={setIsPrefillEnabled}
+          onChange={handlePrefillToggle}
         />
 
         {isPrefillEnabled ? (

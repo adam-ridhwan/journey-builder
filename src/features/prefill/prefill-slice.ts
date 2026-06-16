@@ -53,10 +53,18 @@ const prefillSlice = createSlice({
       const { nodeId, fieldKey } = action.payload;
       delete state.mappings[nodeId]?.[fieldKey];
     },
+    /** Clear all mappings for a node (e.g. when prefill is toggled off). */
+    clearNodePrefillMappings(
+      state,
+      action: PayloadAction<{ nodeId: string }>
+    ) {
+      delete state.mappings[action.payload.nodeId];
+    },
   },
 });
 
-export const { setPrefillMapping, clearPrefillMapping } = prefillSlice.actions;
+export const { setPrefillMapping, clearPrefillMapping, clearNodePrefillMappings } =
+  prefillSlice.actions;
 
 export const prefillReducer = prefillSlice.reducer;
 
