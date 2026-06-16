@@ -34,10 +34,14 @@ const formSlice = createSlice({
     ) {
       state.formData[action.payload.nodeId] = action.payload.data;
     },
+    /** Clear all form data for a node. */
+    clearFormData(state, action: PayloadAction<{ nodeId: string }>) {
+      delete state.formData[action.payload.nodeId];
+    },
   },
 });
 
-export const { updateFormData, setFormData } = formSlice.actions;
+export const { updateFormData, setFormData, clearFormData } = formSlice.actions;
 
 export const formReducer = formSlice.reducer;
 

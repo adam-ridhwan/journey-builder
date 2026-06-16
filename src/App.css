@@ -156,6 +156,8 @@
   align-items: center;
   gap: 12px;
   width: 100%;
+  height: 64px;
+  box-sizing: border-box;
   padding: 14px 16px;
   border-radius: 8px;
   font-size: 15px;
@@ -181,6 +183,21 @@
   color: #8c8c8c;
 }
 
+/* The blue text pill — the clickable left box (re-opens the picker). */
+.prefill-field__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 1px solid #4096ff;
+  border-radius: 8px;
+  background: #e6f4ff;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
 .prefill-field__text {
   display: flex;
   flex-direction: column;
@@ -204,28 +221,35 @@
   color: #8c8c8c;
 }
 
-/* Mapped: light blue fill with a blue border. */
+/* Mapped: a transparent row holding the text pill + a separate clear box. */
 .prefill-field--mapped {
-  justify-content: space-between;
-  border: 1px solid #4096ff;
-  background: #e6f4ff;
+  align-items: stretch;
+  padding: 0;
+  border: none;
+  background: none;
   color: #1a1a22;
-  cursor: pointer;
 }
 
+/* Standalone box on the right that holds the × button. */
 .prefill-field__clear {
   display: flex;
-  border: none;
-  padding: 0;
-  background: none;
-  color: #bfbfbf;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 0 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #8c8c8c;
   font-size: 18px;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: border-color 0.2s;
 }
 
 .prefill-field__clear:hover {
-  color: #8c8c8c;
+  border-color: #ff4d4f;
+  background: #fff1f0;
+  color: #ff4d4f;
 }
 
 .prefill-toggle {

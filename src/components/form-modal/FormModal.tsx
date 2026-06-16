@@ -5,6 +5,7 @@ import { PrefillModal } from './PrefillModal';
 import { PrefillToggle } from './PrefillToggle';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
+  clearFormData,
   selectFormData,
   selectFormDataByNodeId,
   setFormData,
@@ -12,6 +13,7 @@ import {
 import { closeModal, openSubModal } from '@/features/modal/modal-slice';
 import {
   clearNodePrefillMappings,
+  clearPrefillMapping,
   selectPrefillMappingsByNodeId,
 } from '@/features/prefill/prefill-slice';
 import { resolvePrefillValue } from '@/utils/resolve-prefill-value';
@@ -65,10 +67,19 @@ export function FormModal({ graph, node }: FormModalProps) {
     dispatch(closeModal());
   }
 
-  /** Toggle prefill; clear this node's mappings when turning it off. */
+  /**
+   * Toggle prefill. Turning it off clears this node's mappings; turning it on
+   * clears the node's manually-entered form data (it'll be filled from sources).
+   */
   function handlePrefillToggle(enabled: boolean) {
     setIsPrefillEnabled(enabled);
-    if (!enabled) dispatch(clearNodePrefillMappings({ nodeId }));
+
+    if (enabled) {
+      dispatch(clearFormData({ nodeId }));
+      setValues({});
+    } else {
+      dispatch(clearNodePrefillMappings({ nodeId }));
+    }
   }
 
   const uiSchemaElements = formDefinition.ui_schema?.elements ?? [];
@@ -110,6 +121,14 @@ export function FormModal({ graph, node }: FormModalProps) {
                         targetFieldKey={getScopeKey(element.scope)}
                       />
                     )
+                  )
+                }
+                onClear={() =>
+                  dispatch(
+                    clearPrefillMapping({
+                      nodeId,
+                      fieldKey: getScopeKey(element.scope),
+                    })
                   )
                 }
               />
