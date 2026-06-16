@@ -4,18 +4,28 @@ import type { RootState } from '@/app/store';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 /**
- * Where a field's prefill value comes from. Tagged by `type` so new data
- * sources (global data, etc.) can be added as new variants without changing
- * existing ones. `label` is what the UI displays (e.g. `Form A.email`).
+ * Where a field's prefill value comes from. A discriminated union tagged by
+ * `type` so new data sources can be added as new variants without touching
+ * existing ones. Each variant is produced and resolved by a matching
+ * `PrefillDataSource` in `@/data-sources`. `label` is what the UI displays.
  */
-export type PrefillSource = {
-  type: 'form-field';
-  label: string;
-  /** Upstream node whose form supplies the value. */
-  sourceNodeId: string;
-  /** Field key within that upstream form. */
-  sourceFieldKey: string;
-};
+export type PrefillSource =
+  | {
+      type: 'form-field';
+      /** Display label, e.g. `Form A.email`. */
+      label: string;
+      /** Upstream node whose form supplies the value. */
+      sourceNodeId: string;
+      /** Field key within that upstream form. */
+      sourceFieldKey: string;
+    }
+  | {
+      type: 'global-data';
+      /** Display label, e.g. `Organization Name`. */
+      label: string;
+      /** Key into the global data set (see `@/data-sources/global-data`). */
+      sourceKey: string;
+    };
 
 /** A node's prefill config: field key → its source. */
 type NodePrefill = Record<string, PrefillSource>;

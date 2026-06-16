@@ -1,21 +1,16 @@
+import { getDataSource } from '@/data-sources/registry';
+
+import type { ResolveContext } from '@/data-sources/types';
 import type { PrefillSource } from '@/features/prefill/prefill-slice';
 
-/** All submitted form values, keyed by node id then field key. */
-type FormData = Record<string, Record<string, unknown>>;
-
 /**
- * Resolve a prefill source to its concrete value.
- * Add a `case` per source `type` as new data sources are introduced — no other
- * code needs to change.
+ * Resolve a prefill source to its concrete value by delegating to the data
+ * source that owns its `type`. New data sources are handled automatically once
+ * registered in `PREFILL_DATA_SOURCES` — this function never needs to change.
  */
 export function resolvePrefillValue(
   source: PrefillSource,
-  formData: FormData
+  ctx: ResolveContext
 ): unknown {
-  switch (source.type) {
-    case 'form-field':
-      return formData[source.sourceNodeId]?.[source.sourceFieldKey];
-    default:
-      return undefined;
-  }
+  return getDataSource(source.type)?.resolve(source, ctx);
 }

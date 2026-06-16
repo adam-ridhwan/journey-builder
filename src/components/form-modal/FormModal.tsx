@@ -61,7 +61,7 @@ export function FormModal({ graph, node }: FormModalProps) {
   function handleSubmit() {
     const data = { ...values };
     for (const [fieldKey, source] of Object.entries(prefillMappings ?? {})) {
-      data[fieldKey] = resolvePrefillValue(source, allFormData);
+      data[fieldKey] = resolvePrefillValue(source, { formData: allFormData });
     }
     dispatch(setFormData({ nodeId, data }));
     dispatch(closeModal());

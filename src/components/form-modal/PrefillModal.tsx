@@ -1,7 +1,7 @@
 import { useAppDispatch } from '@/app/hooks';
+import { PREFILL_DATA_SOURCES } from '@/data-sources/registry';
 import { closeSubModal } from '@/features/modal/modal-slice';
 import { setPrefillMapping } from '@/features/prefill/prefill-slice';
-import { getUpstreamNodes } from '@/utils/get-upstream-nodes';
 import { Modal, Tag } from 'antd';
 
 import type { FormNodeType } from '../blueprint-nodes/FormNode';
@@ -14,11 +14,19 @@ type PrefillModalProps = {
   targetFieldKey: string;
 };
 
-/** Source-selector modal: pick an upstream form field to prefill from. */
+/** Tag color per badge; unknown badges fall back to a neutral color. */
+const BADGE_COLORS: Record<string, string> = {
+  direct: 'blue',
+  transitive: 'geekblue',
+  global: 'green',
+};
+
+/**
+ * Source-selector modal. Renders every group offered by the registered data
+ * sources, so new sources appear here automatically with no changes to this file.
+ */
 export function PrefillModal({ graph, node, targetFieldKey }: PrefillModalProps) {
   const dispatch = useAppDispatch();
-
-  const upstreamNodes = getUpstreamNodes(graph, node.id);
 
   return (
     <Modal
@@ -29,52 +37,40 @@ export function PrefillModal({ graph, node, targetFieldKey }: PrefillModalProps)
       onCancel={() => dispatch(closeSubModal())}
     >
       <div className='prefill-sources'>
-        {upstreamNodes.map(({ node: upstream, dependency }) => {
-          const form = graph.forms.find(
-            (f) => f.id === upstream.data.component_id
-          );
-          const fieldKeys = Object.keys(form?.field_schema.properties ?? {});
-
-          return (
-            <div className='prefill-source' key={upstream.id}>
+        {PREFILL_DATA_SOURCES.flatMap((dataSource) =>
+          dataSource.getOptionGroups({ graph, node }).map((group) => (
+            <div className='prefill-source' key={`${dataSource.type}:${group.id}`}>
               <div className='prefill-source__header'>
-                <span className='prefill-source__title'>
-                  {upstream.data.name}
-                </span>
-                <Tag color={dependency === 'direct' ? 'blue' : 'geekblue'}>
-                  {dependency}
-                </Tag>
+                <span className='prefill-source__title'>{group.title}</span>
+                {group.badge && (
+                  <Tag color={BADGE_COLORS[group.badge]}>{group.badge}</Tag>
+                )}
               </div>
 
               <div className='prefill-source__fields'>
-                {fieldKeys.map((fieldKey) => (
+                {group.options.map((option) => (
                   <button
                     type='button'
-                    key={fieldKey}
+                    key={option.id}
                     className='prefill-source__field'
                     onClick={() => {
                       dispatch(
                         setPrefillMapping({
                           nodeId: node.id,
                           fieldKey: targetFieldKey,
-                          source: {
-                            type: 'form-field',
-                            label: `${upstream.data.name}.${fieldKey}`,
-                            sourceNodeId: upstream.id,
-                            sourceFieldKey: fieldKey,
-                          },
+                          source: option.source,
                         })
                       );
                       dispatch(closeSubModal());
                     }}
                   >
-                    {fieldKey}
+                    {option.label}
                   </button>
                 ))}
               </div>
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
     </Modal>
   );
