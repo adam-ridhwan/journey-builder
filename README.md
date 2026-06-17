@@ -26,8 +26,8 @@ decisions here:
   workflow needs to surface values from the whole upstream subgraph, not just immediate
   parents.
 - **Separating the stored mapping (`PrefillSource`) from value resolution**, so the same
-  configuration can be re-resolved as upstream data changes — the pattern a workflow
-  engine needs at execution time.
+  configuration can be re-resolved as upstream data changes. This is the pattern a
+  workflow engine needs at execution time.
 
 ---
 
@@ -120,7 +120,7 @@ src/
 │   ├── types.ts              #   PrefillDataSource interface + option types
 │   ├── form-field-source.ts  #   Source: fields of upstream forms (direct/transitive)
 │   ├── global-data.ts        #   Source: global data (Action / Org properties)
-│   └── registry.ts           #   PREFILL_DATA_SOURCES — register sources here
+│   └── registry.ts           #   PREFILL_DATA_SOURCES (register sources here)
 ├── features/                 # Redux slices: form, prefill, modal
 ├── utils/                    # DAG traversal, value resolution, scope/label helpers
 └── test/                     # Shared graph fixture for tests
@@ -235,11 +235,11 @@ npm test
 
 The suite covers three layers:
 
-- **Unit** — DAG traversal, value resolution, scope/label helpers, and the form/prefill
+- **Unit:** DAG traversal, value resolution, scope/label helpers, and the form/prefill
   reducers (`src/utils/*.test.ts`, `src/features/**/*.test.ts`).
-- **Data sources** — the registry and each source's options/resolution, including that a
+- **Data sources:** the registry and each source's options/resolution, including that a
   source rejects mappings it doesn't own (`src/data-sources/data-sources.test.ts`).
-- **Integration** — the prefill flows through the real components and store with React
+- **Integration:** the prefill flows through the real components and store with React
   Testing Library: submit commits to global state, the toggle swaps inputs for prefill
   rows, and selecting a source maps the field and reflects it in the modal
   (`src/components/form-modal/FormModal.test.tsx`).
